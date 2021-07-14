@@ -30,36 +30,100 @@
 
       class App extends React.Component {
         constructor(props) {
-          console.log('constructor');
+          console.log('App constructor');
 
           super(props);
           this.state = {
             data: null,
             new: false,
-            valuetoDisplay: 'user',
+            valuetoDisplay: 'mail',
+            valueTitle: '',
+            value: '',
           };
         }
 
         componentDidMount() {
-          console.log('onmount');
+          console.log('App onmount');
+          fetch('https://randomuser.me/api/')
+            .then((res) => res.json())
+            .then((data) => {
+              this.setState({
+                data: data.results[0],
+                valuetoDisplay: '',
+                valueTitle: '',
+                value: '',
+              });
+            });
+        }
+
+        getRandomeUser = (event) => {
           fetch('https://randomuser.me/api/')
             .then((res) => res.json())
             .then((data) => {
               this.setState({ data: data.results[0] });
             });
-        }
-
-        getRandomeUser = (event) => {
-          this.setState({ new: true });
         };
 
         handleChangeData = (event, content) => {
           console.log('icon clicked');
+          console.log(this.state.data);
+          switch (content) {
+            case 'user':
+              this.setState({
+                valueTitle: 'my Name Is',
+                value: this.state.data.name.first,
+              });
+              break;
+            case 'mail':
+              this.setState({
+                valueTitle: 'Email Address',
+                value: this.state.data.email,
+              });
+              break;
+
+            case 'dob':
+              this.setState({
+                valueTitle: 'Age is',
+                value: this.state.data.dob.age,
+              });
+              break;
+
+            case 'address':
+              this.setState({
+                valueTitle: 'Address is',
+                value:
+                  this.state.data.location.street.number +
+                  ', ' +
+                  this.state.data.location.street.name +
+                  ', ' +
+                  this.state.data.location.city +
+                  ', ' +
+                  this.state.data.location.country,
+              });
+              break;
+
+            case 'phone':
+              this.setState({
+                valueTitle: 'Phone No. is',
+                value: this.state.data.phone,
+              });
+              break;
+
+            case 'password':
+              this.setState({
+                valueTitle: 'Password is',
+                value: this.state.data.login.password,
+              });
+              break;
+
+            default:
+              break;
+          }
           this.setState({ valueToDisplay: content });
         };
 
         render() {
-          console.log('render');
+          console.log('App render');
           return (
             <div className='main-div'>
               <header></header>
@@ -71,6 +135,8 @@
                     <Card
                       data={this.state.data}
                       valuetoDisplay={this.state.valuetoDisplay}
+                      valueTitle={this.state.valueTitle}
+                      value={this.state.value}
                       getRandomeUser={this.getRandomeUser}
                       handleChangeData={this.handleChangeData}
                     />
@@ -86,33 +152,17 @@
 
       class Card extends React.Component {
         constructor(props) {
+          console.log('Card constructor');
           super(props);
-          this.state = {
-            valueTitle: 'my Name Is',
-            value: '',
-          };
+          this.state = {};
         }
 
         componentDidMount() {
-          switch (this.props.valuetoDisplay) {
-            case 'user':
-              this.setState({
-                valueTitle: 'my Name Is',
-                value: this.props.data.name.first,
-              });
-              break;
-            case 'mail':
-              this.setState({
-                valueTitle: 'Email Address',
-                value: this.props.data.email,
-              });
-              break;
-
-            default:
-              break;
-          }
+          console.log('Card mounted');
         }
         render() {
+          console.log('Card Render');
+
           return (
             <article>
               <div className='top'>
@@ -125,8 +175,8 @@
                 </div>
               </div>
               <div className='bottom'>
-                <h5>{this.state.valueTitle}</h5>
-                <h3>{this.state.value}</h3>
+                <h5>{this.props.valueTitle}</h5>
+                <h3>{this.props.value}</h3>
                 <div className='button-div'>
                   <i
                     onClick={(event) =>
@@ -140,10 +190,30 @@
                     }
                     className='fas fa-envelope-open'
                   ></i>
-                  <i className='fas fa-calendar-times'></i>
-                  <i className='fas fa-map'></i>
-                  <i className='fas fa-phone'></i>
-                  <i className='fas fa-lock'></i>
+                  <i
+                    onClick={(event) =>
+                      this.props.handleChangeData(event, 'dob')
+                    }
+                    className='fas fa-calendar-times'
+                  ></i>
+                  <i
+                    onClick={(event) =>
+                      this.props.handleChangeData(event, 'address')
+                    }
+                    className='fas fa-map'
+                  ></i>
+                  <i
+                    onClick={(event) =>
+                      this.props.handleChangeData(event, 'phone')
+                    }
+                    className='fas fa-phone'
+                  ></i>
+                  <i
+                    onClick={(event) =>
+                      this.props.handleChangeData(event, 'password')
+                    }
+                    className='fas fa-lock'
+                  ></i>
                 </div>
               </div>
               <div className='click-div'>
