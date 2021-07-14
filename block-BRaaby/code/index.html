@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script
+      src="https://kit.fontawesome.com/7c7efbb78c.js"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="root"></div>
+    <script
+      src="https://unpkg.com/react@17/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <!-- Load our React component. -->
+    <script type="text/babel">
+      let root = document.querySelector('.root');
+
+      //App component
+
+      class App extends React.Component {
+        constructor(props) {
+          console.log('constructor');
+
+          super(props);
+          this.state = {
+            data: null,
+            new: false,
+            valuetoDisplay: 'user',
+          };
+        }
+
+        componentDidMount() {
+          console.log('onmount');
+          fetch('https://randomuser.me/api/')
+            .then((res) => res.json())
+            .then((data) => {
+              this.setState({ data: data.results[0] });
+            });
+        }
+
+        getRandomeUser = (event) => {
+          this.setState({ new: true });
+        };
+
+        handleChangeData = (event, content) => {
+          console.log('icon clicked');
+          this.setState({ valueToDisplay: content });
+        };
+
+        render() {
+          console.log('render');
+          return (
+            <div className='main-div'>
+              <header></header>
+              <main>
+                <section className='card-sec'>
+                  {!this.state.data ? (
+                    <h1>Loading</h1>
+                  ) : (
+                    <Card
+                      data={this.state.data}
+                      valuetoDisplay={this.state.valuetoDisplay}
+                      getRandomeUser={this.getRandomeUser}
+                      handleChangeData={this.handleChangeData}
+                    />
+                  )}
+                </section>
+              </main>
+            </div>
+          );
+        }
+      }
+
+      //Card component
+
+      class Card extends React.Component {
+        constructor(props) {
+          super(props);
+          this.state = {
+            valueTitle: 'my Name Is',
+            value: '',
+          };
+        }
+
+        componentDidMount() {
+          switch (this.props.valuetoDisplay) {
+            case 'user':
+              this.setState({
+                valueTitle: 'my Name Is',
+                value: this.props.data.name.first,
+              });
+              break;
+            case 'mail':
+              this.setState({
+                valueTitle: 'Email Address',
+                value: this.props.data.email,
+              });
+              break;
+
+            default:
+              break;
+          }
+        }
+        render() {
+          return (
+            <article>
+              <div className='top'>
+                <div className='card-img-div'>
+                  <img
+                    src={this.props.data.picture.large}
+                    alt='profile'
+                    className='flexi-img'
+                  />
+                </div>
+              </div>
+              <div className='bottom'>
+                <h5>{this.state.valueTitle}</h5>
+                <h3>{this.state.value}</h3>
+                <div className='button-div'>
+                  <i
+                    onClick={(event) =>
+                      this.props.handleChangeData(event, 'user')
+                    }
+                    className='fas fa-user'
+                  ></i>
+                  <i
+                    onClick={(event) =>
+                      this.props.handleChangeData(event, 'mail')
+                    }
+                    className='fas fa-envelope-open'
+                  ></i>
+                  <i className='fas fa-calendar-times'></i>
+                  <i className='fas fa-map'></i>
+                  <i className='fas fa-phone'></i>
+                  <i className='fas fa-lock'></i>
+                </div>
+              </div>
+              <div className='click-div'>
+                <a
+                  onClick={this.props.getRandomeUser}
+                  href='#'
+                  className='btn-pri'
+                >
+                  Get Randome user
+                </a>
+              </div>
+            </article>
+          );
+        }
+      }
+
+      ReactDOM.render(<App />, root);
+    </script>
+  </body>
+</html>
